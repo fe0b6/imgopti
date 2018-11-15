@@ -15,4 +15,6 @@ WORKDIR /src
 COPY --from=builder /src/api /src/api
 
 EXPOSE 8080
+USER 33
+
 ENTRYPOINT ["/src/api"]
