@@ -36,6 +36,7 @@ type optiConf struct {
 	WSizes      []int
 	Formats     []string
 	WebpQuality string
+	Crop        map[string]int
 }
 
 type fileData struct {
@@ -195,6 +196,29 @@ func parseRequest(w http.ResponseWriter, r *http.Request) {
 
 	if r.FormValue("formats") != "" {
 		err = json.Unmarshal([]byte(r.FormValue("formats")), &optiC.Formats)
+		if err != nil {
+			log.Println("[error]", err)
+			w.WriteHeader(500)
+			w.Write([]byte(err.Error()))
+			return
+		}
+	}
+
+	if r.FormValue("crop") != "" {
+		err = json.Unmarshal([]byte(r.FormValue("crop")), &optiC.Crop)
+		if err != nil {
+			log.Println("[error]", err)
+			w.WriteHeader(500)
+			w.Write([]byte(err.Error()))
+			return
+		}
+	}
+
+	// Первым делом обрежем
+	if len(optiC.Crop) > 0 {
+		cmd := exec.Command("/usr/bin/convert", "-crop", fmt.Sprintf("%dx%d+%d+%d", optiC.Crop["w"], optiC.Crop["h"], optiC.Crop["l"], optiC.Crop["t"]),
+			path+fname, path+fname)
+		_, err := cmd.Output()
 		if err != nil {
 			log.Println("[error]", err)
 			w.WriteHeader(500)
