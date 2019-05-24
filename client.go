@@ -20,7 +20,7 @@ type FileData struct {
 }
 
 // ProcessImage - отправляем фотку на обработку
-func ProcessImage(f multipart.File, endpoint string, params map[string][]byte) (fds []FileData, err error) {
+func ProcessImage(f io.Reader, endpoint string, params map[string][]byte) (fds []FileData, err error) {
 
 	// Создаем буфер в который сложим запрос
 	var b bytes.Buffer
