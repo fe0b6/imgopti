@@ -41,8 +41,7 @@ func ProcessImage(f io.Reader, endpoint string, params map[string][]byte) (fds [
 	// Добавляем параметры
 	for k, v := range params {
 		if k == "watermark" {
-			var b bytes.Buffer
-			b.Write(v)
+			b := bytes.NewBuffer(v)
 
 			// Добавим файл
 			fw, err = w.CreateFormFile("watermark", "watermark")
@@ -50,7 +49,7 @@ func ProcessImage(f io.Reader, endpoint string, params map[string][]byte) (fds [
 				log.Println("[error]", err)
 				return
 			}
-			if _, err = io.Copy(fw, &b); err != nil {
+			if _, err = io.Copy(fw, b); err != nil {
 				log.Println("[error]", err)
 				return
 			}
