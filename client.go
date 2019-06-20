@@ -40,14 +40,30 @@ func ProcessImage(f io.Reader, endpoint string, params map[string][]byte) (fds [
 
 	// Добавляем параметры
 	for k, v := range params {
-		fw, err = w.CreateFormField(k)
-		if err != nil {
-			log.Println("[error]", err)
-			return
-		}
-		if _, err = fw.Write(v); err != nil {
-			log.Println("[error]", err)
-			return
+		if k == "watermark" {
+			var b bytes.Buffer
+			b.Write(v)
+
+			// Добавим файл
+			fw, err = w.CreateFormFile("watermark", "watermark")
+			if err != nil {
+				log.Println("[error]", err)
+				return
+			}
+			if _, err = io.Copy(fw, &b); err != nil {
+				log.Println("[error]", err)
+				return
+			}
+		} else {
+			fw, err = w.CreateFormField(k)
+			if err != nil {
+				log.Println("[error]", err)
+				return
+			}
+			if _, err = fw.Write(v); err != nil {
+				log.Println("[error]", err)
+				return
+			}
 		}
 	}
 
